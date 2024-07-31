@@ -21,6 +21,10 @@ from .mask2former_layers import (Mask2FormerTransformerDecoder,
 from .utils import (MLP, AdaptivePadding, ConditionalAttention, DynamicConv,
                     PatchEmbed, PatchMerging, coordinate_to_encoding,
                     inverse_sigmoid, nchw_to_nlc, nlc_to_nchw)
+from .adaptor_modules import InteractionBlock, SpatialPriorModule, deform_inputs
+from .dinov2_layers import (MemEffAttention, Mlp, NestedTensorBlock, 
+                            SwiGLUFFNFused)
+from .dinov2_layers import PatchEmbed as DinoV2PatchEmbed
 
 __all__ = [
     'nlc_to_nchw', 'nchw_to_nlc', 'AdaptivePadding', 'PatchEmbed',
@@ -37,5 +41,7 @@ __all__ = [
     'CdnQueryGenerator', 'Mask2FormerTransformerEncoder',
     'Mask2FormerTransformerDecoderLayer', 'Mask2FormerTransformerDecoder',
     'GroundingDinoTransformerDecoderLayer', 'GroundingDinoTransformerEncoder',
-    'GroundingDinoTransformerDecoder'
+    'GroundingDinoTransformerDecoder', 'InteractionBlock',
+    'SpatialPriorModule', 'deform_inputs', 'MemEffAttention', 'Mlp', 
+    'NestedTensorBlock', 'SwiGLUFFNFused', 'DinoV2PatchEmbed'
 ]

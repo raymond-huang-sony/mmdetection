@@ -10,6 +10,7 @@ from .ema import ExpMomentumEMA
 from .inverted_residual import InvertedResidual
 from .matrix_nms import mask_matrix_nms
 from .msdeformattn_pixel_decoder import MSDeformAttnPixelDecoder
+from .ms_deform_attn import MSDeformAttn
 from .normed_predictor import NormedConv2d, NormedLinear
 from .pixel_decoder import PixelDecoder, TransformerEncoderPixelDecoder
 from .positional_encoding import (LearnedPositionalEncoding,
@@ -36,7 +37,10 @@ from .transformer import (MLP, AdaptivePadding, CdnQueryGenerator,
                           Mask2FormerTransformerDecoderLayer,
                           Mask2FormerTransformerEncoder, PatchEmbed,
                           PatchMerging, coordinate_to_encoding,
-                          inverse_sigmoid, nchw_to_nlc, nlc_to_nchw)
+                          inverse_sigmoid, nchw_to_nlc, nlc_to_nchw,
+                          InteractionBlock, SpatialPriorModule, deform_inputs,
+                          MemEffAttention, Mlp, NestedTensorBlock, 
+                          SwiGLUFFNFused, DinoV2PatchEmbed)
 
 # yapf: enable
 
@@ -61,5 +65,8 @@ __all__ = [
     'ConditionalDetrTransformerDecoderLayer', 'DinoTransformerDecoder',
     'CdnQueryGenerator', 'Mask2FormerTransformerEncoder',
     'Mask2FormerTransformerDecoderLayer', 'Mask2FormerTransformerDecoder',
-    'SinePositionalEncoding3D', 'FrozenBatchNorm2d'
+    'SinePositionalEncoding3D', 'FrozenBatchNorm2d', 'MSDeformAttn',
+    'InteractionBlock', 'SpatialPriorModule', 'deform_inputs',
+    'MemEffAttention', 'Mlp', 'NestedTensorBlock', 
+    'SwiGLUFFNFused', 'DinoV2PatchEmbed'
 ]

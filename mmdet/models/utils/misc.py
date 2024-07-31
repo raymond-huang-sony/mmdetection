@@ -17,6 +17,22 @@ from mmdet.structures.mask import BitmapMasks, PolygonMasks
 from mmdet.utils import OptInstanceList
 
 
+def to_length(t, length):
+    assert isinstance(t, tuple)
+    if len(t) >= length:
+        return t[:length]
+    assert len(t) > 0
+    return t + t[-1:] * (length - len(t))
+
+
+def as_tuple(a):
+    if isinstance(a, tuple):
+        return a
+    if isinstance(a, list):
+        return tuple(a)
+    return (a,)
+
+
 class SigmoidGeometricMean(Function):
     """Forward and backward function of geometric mean of two sigmoid
     functions.
