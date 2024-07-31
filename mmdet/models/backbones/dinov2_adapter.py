@@ -106,7 +106,6 @@ class DinoV2Adapter(DinoVisionTransformer):
         active_task='task_agnostic',
         normalize_interaction=False,
         interpolation_up=False,
-        moe_cfg=None,
         *args,
         **kwargs
     ):
@@ -208,7 +207,6 @@ class DinoV2Adapter(DinoVisionTransformer):
                         and use_extra_extractor
                     ),
                     normalize_interaction=self.normalize_interaction,
-                    moe_cfg=moe_cfg,
                 )
                 for i in range(len(interaction_indexes))
             ]
