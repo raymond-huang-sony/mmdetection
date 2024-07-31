@@ -12,7 +12,7 @@ from functools import partial
 
 import torch
 import torch.nn.functional as F
-from mmcv.cnn.bricks.registry import ATTENTION
+from mmdet.registry import MODELS
 from mmcv.ops.multi_scale_deform_attn import (
     MultiScaleDeformableAttnFunction as MSDeformAttnFunction,
 )
@@ -28,7 +28,7 @@ def _is_power_of_2(n):
     return (n & (n - 1) == 0) and n != 0
 
 
-@ATTENTION.register_module()
+@MODELS.register_module()
 class MSDeformAttn(nn.Module):
     def __init__(
         self,
