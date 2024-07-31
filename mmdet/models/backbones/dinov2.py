@@ -24,7 +24,7 @@ from mmengine.logging import print_log
 
 from ..layers import MemEffAttention, Mlp, SwiGLUFFNFused
 from ..layers import NestedTensorBlock as Block
-from ..layers import DINOv2PatchEmbed as PatchEmbed
+from ..layers import DinoV2PatchEmbed as PatchEmbed
 
 
 def named_apply(
