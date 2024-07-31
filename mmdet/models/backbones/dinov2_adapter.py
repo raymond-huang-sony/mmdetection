@@ -235,6 +235,8 @@ class DinoV2Adapter(DinoVisionTransformer):
         if freeze_adapter:
             self._freeze_adapter()
 
+        import pdb;pdb.set_trace()
+
     def _init_weights(self, m):
         if isinstance(m, nn.Linear):
             trunc_normal_(m.weight, std=0.02)
