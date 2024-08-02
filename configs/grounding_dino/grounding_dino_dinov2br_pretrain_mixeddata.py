@@ -26,6 +26,7 @@ model = dict(
         add_pooling_layer=True,
     ),
     backbone=dict(
+        type='DistillDinoV2Adapter',
         backbone=dict(
             type='DinoV2Adapter',
             img_size=518,
