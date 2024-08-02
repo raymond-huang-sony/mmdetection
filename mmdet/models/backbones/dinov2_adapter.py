@@ -96,7 +96,7 @@ class DinoV2Adapter(DinoVisionTransformer):
         adapter_patch_size=16,
         adapter_drop_path_rate=0,
         pretrained=None,
-        load_from=None # same as pretrained but including weights for adapter
+        load_from=None, # same as pretrained but including weights for adapter
         revise_keys=None,
         task_embeddings=(),
         task_prompts=(),
