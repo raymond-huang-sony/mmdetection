@@ -14,6 +14,7 @@ from ..utils import as_tuple, to_length
 from ..layers import (MSDeformAttn, InteractionBlock, 
                       SpatialPriorModule, deform_inputs)
 from .dinov2 import DinoVisionTransformer
+from mmengine.model import BaseModule, ModuleDict
 
 
 class QKVTaskLoRA(nn.Module):
@@ -75,6 +76,21 @@ class QKVTaskLoRA(nn.Module):
         return qkv
 
 
+def init_weights(model, pretrained=None, revise_keys=None):
+    if isinstance(pretrained, str):
+        load_checkpoint(
+            model,
+            pretrained,
+            map_location='cpu',
+            strict=False,
+            **(
+                {'revise_keys': revise_keys}
+                if revise_keys is not None
+                else {}
+            ),
+        )
+
+
 @MODELS.register_module()
 class DinoV2Adapter(DinoVisionTransformer):
     def __init__(
@@ -96,7 +112,6 @@ class DinoV2Adapter(DinoVisionTransformer):
         adapter_patch_size=16,
         adapter_drop_path_rate=0,
         pretrained=None,
-        load_from=None, # same as pretrained but including weights for adapter
         revise_keys=None,
         task_embeddings=(),
         task_prompts=(),
@@ -137,7 +152,7 @@ class DinoV2Adapter(DinoVisionTransformer):
             as_tuple(task_lora_dropouts), len(task_loras)
         )
 
-        self.init_weights(pretrained, revise_keys=revise_keys)
+        init_weights(pretrained, revise_keys=revise_keys)
 
         if len(task_embeddings) > 0:
             self.task_embeddings = nn.ParameterDict(
@@ -229,9 +244,6 @@ class DinoV2Adapter(DinoVisionTransformer):
         self.apply(self._init_deform_weights)
         normal_(self.level_embed)
 
-        self.init_weights(load_from, revise_keys=revise_keys)
-        import pdb;pdb.set_trace()
-        
         if freeze_backbone:
             self._freeze_backbone()
         if freeze_adapter:
@@ -481,3 +493,27 @@ class DinoV2Adapter(DinoVisionTransformer):
                     else {}
                 ),
             )
+
+
+@MODELS.register_module()
+class DistillDinoV2Adapter(BaseModule):
+
+    def __init__(
+        self, 
+        backbone, 
+        teachers,
+        pretrained=None,
+        revise_keys=None,
+    ):
+        super().__init__()
+        self.backbone = MODELS.build(backbone)
+        # build teachers
+        self.teachers = ModuleDict(
+            {key: MODELS.build(val) for key, val in teachers.items()})
+        init_weights(pretrained, revise_keys=revise_keys)
+
+    def forward(self, x, *args, **kwargs):
+        outs = self.backbone(x, *args, **kwargs)
+        outs = [teacher(outs) for _, teacher in self.teachers]
+        import pdb;pdb.set_trace()
+        return outs

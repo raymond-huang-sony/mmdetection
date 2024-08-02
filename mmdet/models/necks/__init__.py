@@ -18,10 +18,14 @@ from .ssd_neck import SSDNeck
 from .ssh import SSH
 from .yolo_neck import YOLOV3Neck
 from .yolox_pafpn import YOLOXPAFPN
+from .dinov2_adapter import (SequentialNecks, MultiLayersPerception, 
+                             IndexSelect, Permute, Reshape, Transpose, 
+                             TorchNnModule)
 
 __all__ = [
     'FPN', 'BFP', 'ChannelMapper', 'HRFPN', 'NASFPN', 'FPN_CARAFE', 'PAFPN',
     'NASFCOS_FPN', 'RFP', 'YOLOV3Neck', 'FPG', 'DilatedEncoder',
     'CTResNetNeck', 'SSDNeck', 'YOLOXPAFPN', 'DyHead', 'CSPNeXtPAFPN', 'SSH',
-    'FPN_DropBlock'
+    'FPN_DropBlock', 'SequentialNecks', 'MultiLayersPerception', 'IndexSelect', 
+    'Permute', 'Reshape', 'Transpose', 'TorchNnModule'
 ]
