@@ -78,6 +78,7 @@ class QKVTaskLoRA(nn.Module):
 
 def init_weights(model, pretrained=None, revise_keys=None):
     if isinstance(pretrained, str):
+        import pdb;pdb.set_trace()
         load_checkpoint(
             model,
             pretrained,
