@@ -506,6 +506,7 @@ class DistillDinoV2Adapter(BaseModule):
         revise_keys=None,
     ):
         super().__init__()
+        import pdb;pdb.set_trace()
         self.backbone = MODELS.build(backbone)
         # build teachers
         self.teachers = ModuleDict(
