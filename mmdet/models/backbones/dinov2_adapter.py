@@ -529,7 +529,7 @@ class DistillDinoV2Adapter(BaseModule):
 
     def forward(self, x, *args, **kwargs):
         _, _, raw_H, raw_W = x.shape
-        patch_size = self.backbone.adapter_patch_size
+        patch_size = 32
         if raw_H % patch_size == 0 and raw_W % patch_size == 0:
             outs = self.backbone(x, *args, **kwargs)
         else:
