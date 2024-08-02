@@ -529,7 +529,7 @@ class DistillDinoV2Adapter(BaseModule):
 
 
 @MODELS.register_module()
-class DistillDinoV2AdapterGDINO(DistillDinoV2Adapter)
+class DistillDinoV2AdapterGDINO(DistillDinoV2Adapter):
 
     def interup(self, x, size):
         return F.interpolate(x, size=size, mode='bicubic', align_corners=False)
