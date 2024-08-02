@@ -541,7 +541,7 @@ class DistillDinoV2Adapter(BaseModule):
             # scale feature maps
             outs = [self.interdown(out, 
                     size=(
-                        int(math.ceil(raw_H / s)), int(math.ceil(raw_W // s))
+                        int(math.ceil(raw_H / s)), int(math.ceil(raw_W / s))
                     ))
                     for s, out in zip((4, 8, 16, 32), outs)]
             import pdb;pdb.set_trace()
