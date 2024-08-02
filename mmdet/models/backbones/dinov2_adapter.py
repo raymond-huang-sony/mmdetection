@@ -515,7 +515,8 @@ class DistillDinoV2Adapter(BaseModule):
         self.backbone = MODELS.build(backbone)
         # build teachers
         self.teachers = ModuleDict(
-            {key: NeckWrapper(val) for key, val in teachers.items()})
+            {key: DistillDinoV2Adapter.NeckWrapper(val)
+                for key, val in teachers.items()})
         init_weights(self, pretrained, revise_keys=revise_keys)
         import pdb;pdb.set_trace()
 
