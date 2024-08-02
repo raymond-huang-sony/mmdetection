@@ -523,6 +523,14 @@ class DistillDinoV2Adapter(BaseModule):
                 for key, val in teachers.items()})
         init_weights(self, pretrained, revise_keys=revise_keys)
 
+    def forward(self, x, *args, **kwargs):
+        outs = self.backbone(x, *args, **kwargs)
+        return [teacher(outs) for _, teacher in self.teachers.items()]
+
+
+@MODELS.register_module()
+class DistillDinoV2AdapterGDINO(DistillDinoV2Adapter)
+
     def interup(self, x, size):
         return F.interpolate(x, size=size, mode='bicubic', align_corners=False)
 
@@ -547,6 +555,4 @@ class DistillDinoV2Adapter(BaseModule):
                         int(math.ceil(raw_H / s)), int(math.ceil(raw_W / s))
                     ))
                     for s, out in zip((4, 8, 16, 32), outs)]
-            import pdb;pdb.set_trace()
-        outs = [teacher(outs) for _, teacher in self.teachers.items()]
-        return outs
+        return [teacher(outs) for _, teacher in self.teachers.items()]

@@ -18,7 +18,8 @@ from .ssd_vgg import SSDVGG
 from .swin import SwinTransformer
 from .trident_resnet import TridentResNet
 from .dinov2 import DinoVisionTransformer
-from .dinov2_adapter import DinoV2Adapter
+from .dinov2_adapter import (DinoV2Adapter, DistillDinoV2Adapter, 
+                             DistillDinoV2AdapterGDINO)
 
 __all__ = [
     'RegNet', 'ResNet', 'ResNetV1d', 'ResNeXt', 'SSDVGG', 'HRNet',
@@ -26,5 +27,6 @@ __all__ = [
     'DetectoRS_ResNeXt', 'Darknet', 'ResNeSt', 'TridentResNet', 'CSPDarknet',
     'SwinTransformer', 'PyramidVisionTransformer',
     'PyramidVisionTransformerV2', 'EfficientNet', 'CSPNeXt',
-    'DinoVisionTransformer', 'DinoV2Adapter'
+    'DinoVisionTransformer', 'DinoV2Adapter', 'DistillDinoV2Adapter',
+    'DistillDinoV2AdapterGDINO'
 ]
