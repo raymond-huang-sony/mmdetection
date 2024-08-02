@@ -511,7 +511,6 @@ class DistillDinoV2Adapter(BaseModule):
         # build teachers
         self.teachers = ModuleDict(
             {key: MODELS.build(val) for key, val in teachers.items()})
-        import pdb;pdb.set_trace()
         init_weights(pretrained, revise_keys=revise_keys)
         import pdb;pdb.set_trace()
 
