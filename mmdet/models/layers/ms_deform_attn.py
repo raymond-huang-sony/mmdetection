@@ -130,7 +130,6 @@ class MSDeformAttn(nn.Module):
 
         N, Len_q, _ = query.shape
         N, Len_in, _ = input_flatten.shape
-        import pdb;pdb.set_trace()
         assert (
             input_spatial_shapes[:, 0] * input_spatial_shapes[:, 1]
         ).sum() == Len_in
