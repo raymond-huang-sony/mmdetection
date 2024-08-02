@@ -506,12 +506,12 @@ class DistillDinoV2Adapter(BaseModule):
         revise_keys=None,
     ):
         super().__init__()
-        import pdb;pdb.set_trace()
         self.backbone = MODELS.build(backbone)
         # build teachers
         self.teachers = ModuleDict(
             {key: MODELS.build(val) for key, val in teachers.items()})
         init_weights(pretrained, revise_keys=revise_keys)
+        import pdb;pdb.set_trace()
 
     def forward(self, x, *args, **kwargs):
         outs = self.backbone(x, *args, **kwargs)
