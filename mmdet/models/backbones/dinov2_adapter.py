@@ -77,7 +77,6 @@ class QKVTaskLoRA(nn.Module):
 
 
 def init_weights(model, pretrained=None, revise_keys=None):
-    import pdb;pdb.set_trace()
     if isinstance(pretrained, str):
         load_checkpoint(
             model,
@@ -153,7 +152,7 @@ class DinoV2Adapter(DinoVisionTransformer):
             as_tuple(task_lora_dropouts), len(task_loras)
         )
 
-        init_weights(pretrained, revise_keys=revise_keys)
+        init_weights(self, pretrained, revise_keys=revise_keys)
 
         if len(task_embeddings) > 0:
             self.task_embeddings = nn.ParameterDict(
@@ -511,8 +510,7 @@ class DistillDinoV2Adapter(BaseModule):
         # build teachers
         self.teachers = ModuleDict(
             {key: MODELS.build(val) for key, val in teachers.items()})
-        import pdb;pdb.set_trace()
-        init_weights(pretrained, revise_keys=revise_keys)
+        init_weights(self, pretrained, revise_keys=revise_keys)
         import pdb;pdb.set_trace()
 
     def forward(self, x, *args, **kwargs):
