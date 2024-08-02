@@ -1,7 +1,8 @@
 import math
-from typing import Any, Dict
-
 import numpy as np
+from typing import Any, Dict
+from functools import partial
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
