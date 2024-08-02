@@ -760,7 +760,7 @@ class SwinTransformer(BaseModule):
                                self.num_features[i]).permute(0, 3, 1,
                                                              2).contiguous()
                 outs.append(out)
-
+        import pdb;pdb.set_trace()
         return outs
 
 
