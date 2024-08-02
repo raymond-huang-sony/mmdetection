@@ -49,7 +49,7 @@ model = dict(
             freeze_backbone=True,
         ),
         teachers=dict(
-            gdino=dict(
+            gdino8x=dict(
                 type='SequentialNecks',
                 necks=[
                     dict(
@@ -66,6 +66,56 @@ model = dict(
                         hidden_size=1024,
                         output_size=256,
                     ),
+                    dict(
+                        type='Permute',
+                        dims=(0, 3, 1, 2),
+                    )
+                ]
+            ),
+            gdino16x=dict(
+                type='SequentialNecks',
+                necks=[
+                    dict(
+                        type='IndexSelect',
+                        index=2,
+                    ),
+                    dict(
+                        type='Permute',
+                        dims=(0, 2, 3, 1),
+                    ),
+                    dict(
+                        type='MultiLayersPerception',
+                        input_size=768,
+                        hidden_size=1024,
+                        output_size=512,
+                    ),
+                    dict(
+                        type='Permute',
+                        dims=(0, 3, 1, 2),
+                    )
+                ]
+            ),
+            gdino32x=dict(
+                type='SequentialNecks',
+                necks=[
+                    dict(
+                        type='IndexSelect',
+                        index=1,
+                    ),
+                    dict(
+                        type='Permute',
+                        dims=(0, 2, 3, 1),
+                    ),
+                    dict(
+                        type='MultiLayersPerception',
+                        input_size=768,
+                        hidden_size=1024,
+                        output_size=1024,
+                    ),
+                    dict(
+                        type='Permute',
+                        dims=(0, 3, 1, 2),
+                    )
                 ]
             )
         )
