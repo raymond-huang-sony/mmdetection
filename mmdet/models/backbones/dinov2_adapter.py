@@ -536,8 +536,7 @@ class DistillDinoV2Adapter(BaseModule):
             # scale images
             H = patch_size * int(math.ceil(raw_H / patch_size))
             W = patch_size * int(math.ceil(raw_W / patch_size))
-            # x = self.interup(x, (H, W))
-            x = self.interdown(x, (224, 224))
+            x = self.interup(x, (H, W))
             outs = self.backbone(x, *args, **kwargs)
             import pdb;pdb.set_trace()
             # scale feature maps
