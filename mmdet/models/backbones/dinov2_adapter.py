@@ -498,6 +498,12 @@ class DinoV2Adapter(DinoVisionTransformer):
 @MODELS.register_module()
 class DistillDinoV2Adapter(BaseModule):
 
+    class NeckWrapper(nn.Module):
+
+        def __init__(self, neck):
+            super().__init__()
+            self.adapt_from = MODELS.build(neck)
+
     def __init__(
         self, 
         backbone, 
@@ -509,7 +515,7 @@ class DistillDinoV2Adapter(BaseModule):
         self.backbone = MODELS.build(backbone)
         # build teachers
         self.teachers = ModuleDict(
-            {key: MODELS.build(val) for key, val in teachers.items()})
+            {key: NeckWrapper(val) for key, val in teachers.items()})
         init_weights(self, pretrained, revise_keys=revise_keys)
         import pdb;pdb.set_trace()
 
