@@ -96,6 +96,7 @@ class DinoV2Adapter(DinoVisionTransformer):
         adapter_patch_size=16,
         adapter_drop_path_rate=0,
         pretrained=None,
+        load_from=None # same as pretrained but including weights for adapter
         revise_keys=None,
         task_embeddings=(),
         task_prompts=(),
@@ -136,7 +137,6 @@ class DinoV2Adapter(DinoVisionTransformer):
             as_tuple(task_lora_dropouts), len(task_loras)
         )
 
-        import pdb;pdb.set_trace()
         self.init_weights(pretrained, revise_keys=revise_keys)
 
         if len(task_embeddings) > 0:
@@ -229,6 +229,9 @@ class DinoV2Adapter(DinoVisionTransformer):
         self.apply(self._init_deform_weights)
         normal_(self.level_embed)
 
+        self.init_weights(load_from, revise_keys=revise_keys)
+        import pdb;pdb.set_trace()
+        
         if freeze_backbone:
             self._freeze_backbone()
         if freeze_adapter:
