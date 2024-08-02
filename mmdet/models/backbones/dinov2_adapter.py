@@ -505,6 +505,9 @@ class DistillDinoV2Adapter(BaseModule):
             super().__init__()
             self.adapt_from = MODELS.build(neck)
 
+        def forward(self, *args, **kwargs):
+            return self.adapt_from(*args, **kwargs)
+
     def __init__(
         self, 
         backbone, 
