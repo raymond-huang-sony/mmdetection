@@ -539,7 +539,10 @@ class DistillDinoV2Adapter(BaseModule):
             x = self.interup(x, (H, W))
             outs = self.backbone(x, *args, **kwargs)
             # scale feature maps
-            outs = [self.interdown(out, size=(raw_H // s, raw_W // s))
+            outs = [self.interdown(out, 
+                    size=(
+                        int(math.ceil(raw_H / s)), int(math.ceil(raw_W // s))
+                    ))
                     for s, out in zip((4, 8, 16, 32), outs)]
             import pdb;pdb.set_trace()
         outs = [teacher(outs) for _, teacher in self.teachers.items()]
