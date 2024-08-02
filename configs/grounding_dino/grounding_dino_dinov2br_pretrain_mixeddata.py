@@ -72,7 +72,7 @@ model = dict(
     ),
     neck=dict(
         type='ChannelMapper',
-        in_channels=[192, 384, 768],
+        in_channels=[256, 512, 1024]
         kernel_size=1,
         out_channels=256,
         act_cfg=None,

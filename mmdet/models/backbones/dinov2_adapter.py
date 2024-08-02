@@ -350,6 +350,7 @@ class DinoV2Adapter(DinoVisionTransformer):
         c2, c3, c4 = self._add_level_embed(c2, c3, c4)
         c = torch.cat([c2, c3, c4], dim=1)
 
+        import pdb;pdb.set_trace()
         assert x.shape[-2] % self.adapter_patch_size == 0
         assert x.shape[-1] % self.adapter_patch_size == 0
         H = x.shape[-2] // self.adapter_patch_size
@@ -518,7 +519,6 @@ class DistillDinoV2Adapter(BaseModule):
             {key: DistillDinoV2Adapter.NeckWrapper(val)
                 for key, val in teachers.items()})
         init_weights(self, pretrained, revise_keys=revise_keys)
-        import pdb;pdb.set_trace()
 
     def forward(self, x, *args, **kwargs):
         outs = self.backbone(x, *args, **kwargs)
