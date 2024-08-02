@@ -520,11 +520,16 @@ class DistillDinoV2Adapter(BaseModule):
                 for key, val in teachers.items()})
         init_weights(self, pretrained, revise_keys=revise_keys)
 
+    def interup(self, x, size):
+        return F.interpolate(x, size=size, mode='bicubic', align_corners=False)
+
+    def interdown(self, x, size):
+        return F.interpolate(x, size=size, mode='bicubic', 
+                             align_corners=False, antialias=True)
+
     def forward(self, x, *args, **kwargs):
         _, _, raw_H, raw_W = x.shape
         patch_size = self.backbone.adapter_patch_size
-        interpolate = partial(interpolate, mode='bicubic', antialias=True, 
-                              align_corners=False)
         if raw_H % patch_size == 0 and raw_W % patch_size == 0:
             outs = self.backbone(x, *args, **kwargs)
         else:
@@ -532,10 +537,10 @@ class DistillDinoV2Adapter(BaseModule):
             # scale images
             H = patch_size * int(math.ceil(raw_H / patch_size))
             W = patch_size * int(math.ceil(raw_W / patch_size))
-            x = interpolate(x, size=(H, W))
+            x = self.interup(x, (H, W))
             outs = self.backbone(x, *args, **kwargs)
             # scale feature maps
-            outs = [interpolate(out, size=(raw_H // s, raw_W // s))
+            outs = [self.interdown(out, size=(raw_H // s, raw_W // s))
                     for s, out in zip((4, 8, 16, 32), outs)]
         outs = [teacher(outs) for _, teacher in self.teachers]
         return outs
