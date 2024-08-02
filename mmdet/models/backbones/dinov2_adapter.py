@@ -533,12 +533,12 @@ class DistillDinoV2Adapter(BaseModule):
         if raw_H % patch_size == 0 and raw_W % patch_size == 0:
             outs = self.backbone(x, *args, **kwargs)
         else:
-            import pdb;pdb.set_trace()
             # scale images
             H = patch_size * int(math.ceil(raw_H / patch_size))
             W = patch_size * int(math.ceil(raw_W / patch_size))
             x = self.interup(x, (H, W))
             outs = self.backbone(x, *args, **kwargs)
+            import pdb;pdb.set_trace()
             # scale feature maps
             outs = [self.interdown(out, size=(raw_H // s, raw_W // s))
                     for s, out in zip((4, 8, 16, 32), outs)]
