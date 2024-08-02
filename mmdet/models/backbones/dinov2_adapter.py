@@ -518,6 +518,7 @@ class DistillDinoV2Adapter(BaseModule):
             {key: DistillDinoV2Adapter.NeckWrapper(val)
                 for key, val in teachers.items()})
         init_weights(self, pretrained, revise_keys=revise_keys)
+        import pdb;pdb.set_trace()
 
     def forward(self, x, *args, **kwargs):
         outs = self.backbone(x, *args, **kwargs)
