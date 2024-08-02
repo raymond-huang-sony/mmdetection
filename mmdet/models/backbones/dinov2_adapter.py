@@ -136,6 +136,7 @@ class DinoV2Adapter(DinoVisionTransformer):
             as_tuple(task_lora_dropouts), len(task_loras)
         )
 
+        import pdb;pdb.set_trace()
         self.init_weights(pretrained, revise_keys=revise_keys)
 
         if len(task_embeddings) > 0:
@@ -232,8 +233,6 @@ class DinoV2Adapter(DinoVisionTransformer):
             self._freeze_backbone()
         if freeze_adapter:
             self._freeze_adapter()
-
-        import pdb;pdb.set_trace()
 
     def _init_weights(self, m):
         if isinstance(m, nn.Linear):
