@@ -100,7 +100,7 @@ model = dict(
                 necks=[
                     dict(
                         type='IndexSelect',
-                        index=1,
+                        index=3,
                     ),
                     dict(
                         type='Permute',
