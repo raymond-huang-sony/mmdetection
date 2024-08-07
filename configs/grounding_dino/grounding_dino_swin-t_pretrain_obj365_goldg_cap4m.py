@@ -115,6 +115,7 @@ test_pipeline = [
         scale=(800, 1333),
         keep_ratio=True,
         backend='pillow'),
+    dict(type='Pad', size_divisor=32),
     dict(type='LoadAnnotations', with_bbox=True),
     dict(
         type='PackDetInputs',
