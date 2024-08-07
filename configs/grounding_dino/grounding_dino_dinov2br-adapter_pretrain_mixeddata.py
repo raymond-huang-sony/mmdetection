@@ -26,7 +26,7 @@ model = dict(
         add_pooling_layer=True,
     ),
     backbone=dict(
-        type='DistillDinoV2AdapterGDINO',
+        type='DistillDinoV2Adapter',
         backbone=dict(
             type='DinoV2Adapter',
             img_size=518,
@@ -194,6 +194,7 @@ test_pipeline = [
         scale=(800, 1333),
         keep_ratio=True,
         backend='pillow'),
+    dict(type='Pad', size_divisor=32),
     dict(type='LoadAnnotations', with_bbox=True),
     dict(
         type='PackDetInputs',
