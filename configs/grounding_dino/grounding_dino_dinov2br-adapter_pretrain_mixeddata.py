@@ -63,7 +63,7 @@ model = dict(
                     dict(
                         type='MultiLayersPerception',
                         input_size=768,
-                        hidden_size=1024,
+                        hidden_size=1280,
                         output_size=256,
                     ),
                     dict(
@@ -86,7 +86,7 @@ model = dict(
                     dict(
                         type='MultiLayersPerception',
                         input_size=768,
-                        hidden_size=1024,
+                        hidden_size=1280,
                         output_size=512,
                     ),
                     dict(
@@ -109,7 +109,7 @@ model = dict(
                     dict(
                         type='MultiLayersPerception',
                         input_size=768,
-                        hidden_size=1024,
+                        hidden_size=1280,
                         output_size=1024,
                     ),
                     dict(
