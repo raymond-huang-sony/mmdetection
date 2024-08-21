@@ -98,3 +98,25 @@ model = dict(
         )
     )
 )
+
+test_pipeline = [
+    dict(
+        type='LoadImageFromFile', backend_args=None,
+        imdecode_backend='pillow'),
+    dict(
+        type='FixScaleResize',
+        scale=(800, 1333),
+        keep_ratio=True,
+        backend='pillow'),
+    dict(type='Pad', size_divisor=32),
+    dict(type='LoadAnnotations', with_bbox=True),
+    dict(
+        type='PackDetInputs',
+        meta_keys=('img_id', 'img_path', 'ori_shape', 'img_shape',
+                   'scale_factor', 'text', 'custom_entities',
+                   'tokens_positive'))
+]
+
+val_dataloader = dict(
+    dataset=dict(pipeline=test_pipeline, return_classes=True))
+test_dataloader = val_dataloader
