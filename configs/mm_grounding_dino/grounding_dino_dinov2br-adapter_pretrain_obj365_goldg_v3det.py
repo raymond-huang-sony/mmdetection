@@ -2,6 +2,7 @@ _base_ = 'grounding_dino_swin-b_pretrain_obj365_goldg_v3det.py'
 
 model = dict(
     backbone=dict(
+        _delete_=True,
         type='DistillDinoV2Adapter',
         backbone=dict(
             type='DinoV2Adapter',
