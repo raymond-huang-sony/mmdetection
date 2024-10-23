@@ -337,7 +337,12 @@ class InteractionBlock(nn.Module):
 
 
 class SpatialPriorModule(nn.Module):
-    def __init__(self, inplanes=64, embed_dim=384):
+    def __init__(
+        self,
+        inplanes=64,
+        embed_dim=384,
+        norm_cfg=dict(type='SyncBN', requires_grad=True),
+    ):
         super().__init__()
 
         self.stem = nn.Sequential(
@@ -345,7 +350,7 @@ class SpatialPriorModule(nn.Module):
                 nn.Conv2d(
                     3, inplanes, kernel_size=3, stride=2, padding=1, bias=False
                 ),
-                nn.SyncBatchNorm(inplanes),
+                build_norm_layer(norm_cfg, inplanes)[-1],
                 nn.ReLU(inplace=True),
                 nn.Conv2d(
                     inplanes,
@@ -355,7 +360,7 @@ class SpatialPriorModule(nn.Module):
                     padding=1,
                     bias=False,
                 ),
-                nn.SyncBatchNorm(inplanes),
+                build_norm_layer(norm_cfg, inplanes)[-1],
                 nn.ReLU(inplace=True),
                 nn.Conv2d(
                     inplanes,
@@ -365,7 +370,7 @@ class SpatialPriorModule(nn.Module):
                     padding=1,
                     bias=False,
                 ),
-                nn.SyncBatchNorm(inplanes),
+                build_norm_layer(norm_cfg, inplanes)[-1],
                 nn.ReLU(inplace=True),
                 nn.MaxPool2d(kernel_size=3, stride=2, padding=1),
             ]
@@ -380,7 +385,7 @@ class SpatialPriorModule(nn.Module):
                     padding=1,
                     bias=False,
                 ),
-                nn.SyncBatchNorm(2 * inplanes),
+                build_norm_layer(norm_cfg, 2 * inplanes)[-1],
                 nn.ReLU(inplace=True),
             ]
         )
@@ -394,7 +399,7 @@ class SpatialPriorModule(nn.Module):
                     padding=1,
                     bias=False,
                 ),
-                nn.SyncBatchNorm(4 * inplanes),
+                build_norm_layer(norm_cfg, 4 * inplanes)[-1],
                 nn.ReLU(inplace=True),
             ]
         )
@@ -408,7 +413,7 @@ class SpatialPriorModule(nn.Module):
                     padding=1,
                     bias=False,
                 ),
-                nn.SyncBatchNorm(4 * inplanes),
+                build_norm_layer(norm_cfg, 4 * inplanes)[-1],
                 nn.ReLU(inplace=True),
             ]
         )
