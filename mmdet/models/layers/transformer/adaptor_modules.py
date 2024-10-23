@@ -8,6 +8,7 @@ import torch.utils.checkpoint as cp
 from timm.models.layers import DropPath
 
 from ..ffn import ConvFFN
+from mmcv.cnn import build_norm_layer
 from ..ms_deform_attn import MSDeformAttn
 
 _logger = logging.getLogger(__name__)
