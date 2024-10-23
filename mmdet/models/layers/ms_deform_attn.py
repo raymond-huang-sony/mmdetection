@@ -16,6 +16,7 @@ from mmdet.registry import MODELS
 from mmcv.ops.multi_scale_deform_attn import (
     MultiScaleDeformableAttnFunction as MSDeformAttnFunction,
 )
+from mmshared.models.moe import MoE
 from torch import nn
 from torch.nn.init import constant_, xavier_uniform_
 
@@ -37,6 +38,8 @@ class MSDeformAttn(nn.Module):
         n_heads=8,
         n_points=4,
         ratio=1.0,
+        moe_cfg=None,
+        attn_moe=False,
     ):
         """Multi-Scale Deformable Attention Module.
 
@@ -78,6 +81,23 @@ class MSDeformAttn(nn.Module):
         self.output_proj = nn.Linear(int(d_model * ratio), d_model)
 
         self._reset_parameters()
+
+        self.attn_moe = attn_moe
+        if self.attn_moe:
+            moe_layer = partial(
+                MoE,
+                cfg=moe_cfg,
+                num_experts=moe_cfg.num_experts,
+                k=moe_cfg.top_k,
+                noisy_gate_policy=moe_cfg.noisy_gate_policy,
+            )
+
+            self.value_proj = moe_layer(
+                hidden_size=d_model, expert=self.value_proj
+            )
+            self.output_proj = moe_layer(
+                hidden_size=int(d_model * ratio), expert=self.output_proj
+            )
 
     def _reset_parameters(self):
         constant_(self.sampling_offsets.weight.data, 0.0)
@@ -134,7 +154,10 @@ class MSDeformAttn(nn.Module):
             input_spatial_shapes[:, 0] * input_spatial_shapes[:, 1]
         ).sum() == Len_in
 
-        value = self.value_proj(input_flatten)
+        if self.attn_moe:
+            value, _ = self.value_proj(input_flatten, **kwargs)
+        else:
+            value = self.value_proj(input_flatten)
 
         if input_padding_mask is not None:
             value = value.masked_fill(input_padding_mask[..., None], float(0))
@@ -187,5 +210,8 @@ class MSDeformAttn(nn.Module):
             attention_weights,
             self.im2col_step,
         )
-        output = self.output_proj(output)
+        if self.attn_moe:
+            output, _ = self.output_proj(output, **kwargs)
+        else:
+            output = self.output_proj(output)
         return output
