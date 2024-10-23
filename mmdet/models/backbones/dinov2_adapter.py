@@ -80,6 +80,21 @@ class QKVTaskLoRA(nn.Module):
         return qkv
 
 
+def init_weights(model, pretrained=None, revise_keys=None):
+    if isinstance(pretrained, str):
+        load_checkpoint(
+            model,
+            pretrained,
+            map_location='cpu',
+            strict=False,
+            **(
+                {'revise_keys': revise_keys}
+                if revise_keys is not None
+                else {}
+            ),
+        )
+
+
 @MODELS.register_module()
 class DinoV2Adapter(DinoVisionTransformer):
     def __init__(
