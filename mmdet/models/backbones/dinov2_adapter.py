@@ -1,4 +1,5 @@
 import math
+import logging
 import numpy as np
 from typing import Any, Dict
 from functools import partial
@@ -6,6 +7,7 @@ from functools import partial
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from mmengine.logging import MMLogger
 from mmcv.cnn import build_norm_layer
 from mmengine.runner import load_checkpoint
 from mmdet.registry import MODELS
@@ -516,7 +518,9 @@ class DinoV2Adapter(DinoVisionTransformer):
 
     def init_weights(self, pretrained=None, revise_keys=None):
         if isinstance(pretrained, str):
-            logger = get_root_logger()
+            logger = MMLogger.get_instance(
+                            name='MMLogger',
+                            log_level=logging.INFO)
             load_checkpoint(
                 self,
                 pretrained,
