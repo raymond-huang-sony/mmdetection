@@ -113,6 +113,7 @@ def main():
         # if 'runner_type' is set in the cfg
         runner = RUNNERS.build(cfg)
 
+    import pdb;pdb.set_trace()
     # start training
     runner.train()
 
