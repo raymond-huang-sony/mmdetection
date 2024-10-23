@@ -100,8 +100,8 @@ class Extractor(nn.Module):
                 n_heads=num_heads,
                 n_points=n_points,
                 ratio=deform_ratio,
-                moe_cfg=moe_cfg,
-                attn_moe=(moe_cfg and moe_cfg.extractor_attn_moe),
+                # moe_cfg=moe_cfg,
+                # attn_moe=(moe_cfg and moe_cfg.extractor_attn_moe),
             )
         else:
             self.attn = MemEffCrossAttention(dim)
