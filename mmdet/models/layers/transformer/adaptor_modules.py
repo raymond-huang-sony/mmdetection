@@ -9,7 +9,7 @@ from ..ffn import ConvFFN
 from ..ms_deform_attn import MSDeformAttn
 from timm.models.layers import DropPath
 
-from dinov2_layers.attention import MemEffCrossAttention
+from .dinov2_layers.attention import MemEffCrossAttention
 
 
 def get_reference_points(spatial_shapes, device, dtype):
