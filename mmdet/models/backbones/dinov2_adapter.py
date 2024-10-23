@@ -367,7 +367,6 @@ class DinoV2Adapter(DinoVisionTransformer):
 
         return x
 
-    @auto_fp16(out_fp32=True)
     def forward(self, x, task=None, return_cls_token=None):
         if return_cls_token is None:
             return_cls_token = self.return_cls_token
