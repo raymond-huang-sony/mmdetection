@@ -6,6 +6,7 @@ from functools import partial
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from mmcv.cnn import build_norm_layer
 from mmengine.runner import load_checkpoint
 from mmdet.registry import MODELS
 from timm.models.layers import trunc_normal_
@@ -116,13 +117,18 @@ class DinoV2Adapter(DinoVisionTransformer):
         revise_keys=None,
         task_embeddings=(),
         task_prompts=(),
-        task_prompt_sizes=200,
+        task_prompt_sizes=32,
         task_loras=(),
         task_lora_ranks=16,
         task_lora_dropouts=0.0,
         active_task='task_agnostic',
         normalize_interaction=False,
+        normalize_interaction_has_grad=False,
         interpolation_up=False,
+        moe_cfg=None,
+        adapter_norm_cfg=dict(type='SyncBN', requires_grad=True),
+        adapter_use_deform_attn=True,
+        extra_cls_token=False,
         *args,
         **kwargs
     ):
@@ -139,6 +145,9 @@ class DinoV2Adapter(DinoVisionTransformer):
         self.revise_keys = revise_keys
         self.active_task = active_task
         self.normalize_interaction = normalize_interaction
+        self.normalize_interaction_has_grad = normalize_interaction_has_grad
+        self.adapter_norm_cfg = adapter_norm_cfg
+        self.adapter_use_deform_attn = adapter_use_deform_attn
         assert isinstance(task_embeddings, tuple)
         assert isinstance(task_prompts, tuple)
         self.task_prompt_sizes = to_length(
@@ -153,13 +162,21 @@ class DinoV2Adapter(DinoVisionTransformer):
             as_tuple(task_lora_dropouts), len(task_loras)
         )
 
-        init_weights(self, pretrained, revise_keys=revise_keys)
+        self.init_weights(pretrained, revise_keys=revise_keys)
+
+        if extra_cls_token:
+            self.extra_cls_token = nn.Parameter(
+                1e-6 * torch.randn((1, 1, self.embed_dim))
+            )
+        else:
+            self.extra_cls_token = None
 
         if len(task_embeddings) > 0:
             self.task_embeddings = nn.ParameterDict(
                 {
                     task: nn.Parameter(
-                        torch.zeros(
+                        1e-6
+                        * torch.randn(
                             self.patch_embed.num_patches
                             + 1
                             + self.num_register_tokens,
@@ -176,7 +193,8 @@ class DinoV2Adapter(DinoVisionTransformer):
             self.task_prompts = nn.ParameterDict(
                 {
                     task: nn.Parameter(
-                        torch.zeros(
+                        1e-6
+                        * torch.randn(
                             size,
                             self.embed_dim,
                         )
@@ -203,9 +221,11 @@ class DinoV2Adapter(DinoVisionTransformer):
                 )
 
         embed_dim = self.embed_dim
-        self.level_embed = nn.Parameter(torch.zeros(3, embed_dim))
+        self.level_embed = nn.Parameter(1e-6 * torch.randn(3, embed_dim))
         self.spm = SpatialPriorModule(
-            inplanes=conv_inplane, embed_dim=embed_dim
+            inplanes=conv_inplane,
+            embed_dim=embed_dim,
+            norm_cfg=self.adapter_norm_cfg,
         )
         self.interactions = nn.Sequential(
             *[
@@ -224,21 +244,22 @@ class DinoV2Adapter(DinoVisionTransformer):
                         and use_extra_extractor
                     ),
                     normalize_interaction=self.normalize_interaction,
+                    normalize_interaction_has_grad=self.normalize_interaction_has_grad,
+                    moe_cfg=moe_cfg,
+                    adapter_use_deform_attn=self.adapter_use_deform_attn,
                 )
                 for i in range(len(interaction_indexes))
             ]
         )
         if interpolation_up:
-            self.up = lambda x: nn.functional.interpolate(
-                x, scale_factor=2, mode='bilinear', align_corners=False
-            )
+            self.up = self._interpolate
         else:
             self.up = nn.ConvTranspose2d(embed_dim, embed_dim, 2, 2)
             self.up.apply(self._init_weights)
-        self.norm1 = nn.SyncBatchNorm(embed_dim)
-        self.norm2 = nn.SyncBatchNorm(embed_dim)
-        self.norm3 = nn.SyncBatchNorm(embed_dim)
-        self.norm4 = nn.SyncBatchNorm(embed_dim)
+        self.norm1 = build_norm_layer(self.adapter_norm_cfg, embed_dim)[-1]
+        self.norm2 = build_norm_layer(self.adapter_norm_cfg, embed_dim)[-1]
+        self.norm3 = build_norm_layer(self.adapter_norm_cfg, embed_dim)[-1]
+        self.norm4 = build_norm_layer(self.adapter_norm_cfg, embed_dim)[-1]
 
         self.spm.apply(self._init_weights)
         self.interactions.apply(self._init_weights)
@@ -249,6 +270,11 @@ class DinoV2Adapter(DinoVisionTransformer):
             self._freeze_backbone()
         if freeze_adapter:
             self._freeze_adapter()
+
+    def _interpolate(self, x):
+        return nn.functional.interpolate(
+            x, scale_factor=2, mode='bilinear', align_corners=False
+        )
 
     def _init_weights(self, m):
         if isinstance(m, nn.Linear):
@@ -336,10 +362,12 @@ class DinoV2Adapter(DinoVisionTransformer):
             task_prompt = self.task_prompts[task][None].expand(
                 x.shape[0], -1, -1
             )
-            x = torch.cat((task_prompt, x), dim=1)
+            # [cls token] [task prompt] [patch token]
+            x = torch.cat((x[:, :1], task_prompt, x[:, 1:]), dim=1)
 
         return x
 
+    @auto_fp16(out_fp32=True)
     def forward(self, x, task=None, return_cls_token=None):
         if return_cls_token is None:
             return_cls_token = self.return_cls_token
@@ -373,6 +401,11 @@ class DinoV2Adapter(DinoVisionTransformer):
         x = self.prepare_tokens_with_masks(x)
         x = self.prepare_task_embeddings(x, H, W)
         x = self.prepare_task_prompts(x)
+
+        if self.extra_cls_token is not None:
+            extra = self.extra_cls_token.expand(x.shape[0], -1, -1)
+            # [extra cls token] [cls token] [task prompt] [patch token]
+            x = torch.cat((extra, x), dim=1)
         B, _, C = x.shape
 
         # Interaction
@@ -439,6 +472,7 @@ class DinoV2Adapter(DinoVisionTransformer):
         f4 = self.norm4(c4)
 
         if return_cls_token:
+
             return [f1, f2, f3, f4, cls_token]
         return [f1, f2, f3, f4]
 
@@ -483,11 +517,13 @@ class DinoV2Adapter(DinoVisionTransformer):
 
     def init_weights(self, pretrained=None, revise_keys=None):
         if isinstance(pretrained, str):
+            logger = get_root_logger()
             load_checkpoint(
                 self,
                 pretrained,
                 map_location='cpu',
                 strict=False,
+                logger=logger,
                 **(
                     {'revise_keys': revise_keys}
                     if revise_keys is not None

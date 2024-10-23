@@ -24,6 +24,11 @@ model = dict(
             deform_ratio=0.5,
             interaction_indexes=[[0, 2], [3, 5], [6, 8], [9, 11]],
             freeze_backbone=True,
+            normalize_interaction=True,
+            normalize_interaction_has_grad=True,
+            interpolation_up=True,
+            extra_cls_token=True,
+            adapter_norm_cfg=dict(type='GN', num_groups=32, requires_grad=True),
         ),
         teachers=dict(
             gdino8x=dict(
